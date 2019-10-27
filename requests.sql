@@ -104,3 +104,52 @@ SELECT departament, max(salary) FROM managers GROUP BY departament;
 SELECT departament, max(salary) FROM managers WHERE departament IS NOT NULL GROUP BY departament;
 SELECT departament, max(salary) FROM managers GROUP BY departament HAVING departament IS NOT NULL;
 
+
+
+------------------------------------------------------
+
+
+-- связанный вложенный подзапрос
+SELECT s.id,
+       s.price * s.quantity total,
+       (
+           SELECT p.name
+           FROM products p
+           WHERE s.product_id = p.id
+       ) name
+FROM sales s;
+
+-- несвязанный вложенный подзапрос
+SELECT m.id,
+       m.salary,
+       (SELECT avg(m1.salary) FROM managers m1) average
+FROM managers m;
+
+
+-- Join (объединение таблиц)
+SELECT  s.id, (s.price * s.quantity)
+FROM  sales s
+          INNER JOIN products p ON s.product_id = p.id;
+
+
+
+SELECT m1.id, m1.name, m2.name boss
+FROM managers m1
+         INNER JOIN managers m2 ON m1.boss_id = m2.id;
+
+SELECT m1.id, m1.name, m2.name boss
+FROM managers m1
+         LEFT JOIN managers m2 ON m1.boss_id = m2.id;
+
+------
+
+
+
+SELECT o.id FROM orders o;
+
+
+
+SELECT o.id, o.manager_id, m.name, st.total FROM orders o INNER JOIN (
+    SELECT s.order_id, sum(s.quantity * s.price) total
+    FROM sales s GROUP BY s.order_id
+) st ON o.id = st.order_id INNER JOIN managers m on o.manager_id = m.id;
